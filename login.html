@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Aqua</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <a class="navbar-brand" href="index.html">AQUA.</a>
+        <nav>
+            <a class="nav-link" href="cadastro.html">Criar conta</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="pagina cartao">
+            <h1>Bem-vindo de volta</h1>
+            <p class="subtitulo">Entre na sua conta para continuar.</p>
+
+            <form id="form-login">
+                <label for="email">Email</label>
+                <input class="input_texto" type="email" id="email"
+                    maxlength="100" required>
+
+                <label for="senha">Senha</label>
+                <input class="input_texto" type="password" id="senha"
+                    required>
+
+                <button class="btn_enviar" id="btn-login" type="submit">
+                    Entrar
+                </button>
+            </form>
+
+            <div id="mensagem" class="mensagem" role="status"></div>
+
+            <p class="texto-centro">
+                Ainda não tem uma conta?
+                <a href="cadastro.html">Cadastre-se</a>.
+            </p>
+        </section>
+    </main>
+
+    <script src="pages.js"></script>
+
+    <script>
+        const formLogin = document.getElementById("form-login");
+        const btnLogin = document.getElementById("btn-login");
+
+        formLogin.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            btnLogin.disabled = true;
+            btnLogin.textContent = "Entrando...";
+
+            const dados = {
+                email: document.getElementById("email").value.trim(),
+                senha: document.getElementById("senha").value
+            };
+
+            try {
+                const resposta = await fetch(`${API}/login`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(dados)
+                });
+
+                const resultado = await resposta.json();
+
+                if (!resposta.ok) {
+                    throw new Error(resultado.msg || "Não foi possível entrar.");
+                }
+
+                localStorage.setItem("nome_cliente", resultado.nome);
+                localStorage.setItem("token", resultado.token);
+
+                window.location.href = "index.html";
+
+            } catch (error) {
+                mostrarMensagem(error.message, "erro");
+            } finally {
+                btnLogin.disabled = false;
+                btnLogin.textContent = "Entrar";
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro | Aqua</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <a class="navbar-brand" href="index.html">AQUA.</a>
+        <nav>
+            <a class="nav-link" href="login.html">Login</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="pagina cartao">
+            <h1>Criar conta</h1>
+            <p class="subtitulo">Preencha os dados para se cadastrar.</p>
+
+            <form id="form-cadastro">
+                <label for="nome">Nome completo</label>
+                <input class="input_texto" type="text" id="nome"
+                    maxlength="100" required>
+
+                <label for="cpf">CPF</label>
+                <input class="input_texto" type="text" id="cpf"
+                    placeholder="000.000.000-00"
+                    pattern="[0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2}"
+                    title="Use o formato 000.000.000-00"
+                    maxlength="14" required>
+
+                <label for="celular">Celular</label>
+                <input class="input_texto" type="tel" id="celular"
+                    placeholder="(42) 99999-9999"
+                    maxlength="15" required>
+
+                <label for="email">Email</label>
+                <input class="input_texto" type="email" id="email"
+                    maxlength="100" required>
+
+                <label for="senha">Senha</label>
+                <input class="input_texto" type="password" id="senha"
+                    minlength="6" required>
+
+                <button class="btn_enviar" id="btn-cadastrar" type="submit">
+                    Criar conta
+                </button>
+            </form>
+
+            <div id="mensagem" class="mensagem" role="status"></div>
+
+            <p class="texto-centro">
+                Já tem uma conta?
+                <a href="login.html">Entre aqui</a>.
+            </p>
+        </section>
+    </main>
+
+    <script src="pages.js"></script>
+
+    <script>
+        const formCadastro = document.getElementById("form-cadastro");
+        const btnCadastrar = document.getElementById("btn-cadastrar");
+
+        formCadastro.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            btnCadastrar.disabled = true;
+            btnCadastrar.textContent = "Cadastrando...";
+
+            const dados = {
+                nome: document.getElementById("nome").value.trim(),
+                cpf: document.getElementById("cpf").value.trim(),
+                celular: document.getElementById("celular").value.trim(),
+                email: document.getElementById("email").value.trim(),
+                senha: document.getElementById("senha").value
+            };
+
+            try {
+                const resposta = await fetch(`${API}/cliente`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(dados)
+                });
+
+                const resultado = await resposta.json();
+
+                if (!resposta.ok) {
+                    throw new Error(resultado.msg || "Erro no cadastro.");
+                }
+
+                mostrarMensagem(
+                    "Cadastro realizado! Agora você pode entrar.",
+                    "sucesso"
+                );
+
+                formCadastro.reset();
+
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 1200);
+
+            } catch (error) {
+                mostrarMensagem(error.message, "erro");
+            } finally {
+                btnCadastrar.disabled = false;
+                btnCadastrar.textContent = "Criar conta";
+            }
+        });
+    </script>
+
+</body>
+</html>

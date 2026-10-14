@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha conta | Aqua</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <a class="navbar-brand" href="index.html">AQUA.</a>
+
+        <nav>
+            <a class="nav-link" href="cadastro.html">Cadastro</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="pagina cartao">
+            <h1>Minha conta</h1>
+            <p class="subtitulo">
+                Bem-vindo, <strong id="nome-cliente">cliente</strong>!
+            </p>
+
+            <h2>Meus dados</h2>
+
+            <div id="perfil-info" class="perfil-info">
+                Carregando seus dados...
+            </div>
+
+            <button class="btn_enviar" type="button" onclick="logout()">
+                Sair da conta
+            </button>
+        </section>
+    </main>
+
+    <script src="pages.js"></script>
+
+    <script>
+        const nome = localStorage.getItem("nome_cliente");
+
+        if (!nome || !localStorage.getItem("token")) {
+            window.location.replace("login.html");
+        } else {
+            document.getElementById("nome-cliente").textContent = nome;
+            carregarPerfil();
+        }
+    </script>
+
+</body>
+</html>
