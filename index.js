@@ -1,3 +1,20 @@
+//Buscar por nome: http://localhost:3000/produto?nome=processador
+
+//Filtrar por categoria: http://localhost:3000/produto?categoria=processador
+
+//Filtrar por faixa de preço: http://localhost:3000/produto?preco_min=200&preco_max=700
+
+//Ordenar do menor para o maior preço: http://localhost:3000/produto?ordem=asc
+
+//Ordenar do maior para o menor preço: http://localhost:3000/produto?ordem=desc
+
+//Navegar pelas páginas (Página 2): http://localhost:3000/produto?pagina=2
+
+//Combinar múltiplos filtros: `
+
+
+
+
 require("dotenv").config();
 
 const express = require("express");
