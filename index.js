@@ -159,6 +159,70 @@ app.get("/cliente/perfil", autenticar, async (req, res) => {
     }
 });
 
+// ROTA DE PRODUTOS COM FILTROS, ORDENAÇÃO E PAGINAÇÃO
+app.get("/produto", async (req, res) => {
+    try {
+        const { nome, categoria, preco_min, preco_max, ordem, pagina } = req.query;
+
+        let sql = "SELECT * FROM produto WHERE 1=1";
+        const params = [];
+
+        // 1. Filtro por nome
+        if (nome) {
+            sql += " AND nome LIKE ?";
+            params.push(`%${nome}%`);
+        }
+
+        // 2. Filtro por categoria
+        if (categoria) {
+            sql += " AND categoria = ?";
+            params.push(categoria);
+        }
+
+        // 3. Filtro por preço mínimo
+        if (preco_min) {
+            sql += " AND preco >= ?";
+            params.push(Number(preco_min));
+        }
+
+        // 4. Filtro por preço máximo
+        if (preco_max) {
+            sql += " AND preco <= ?";
+            params.push(Number(preco_max));
+        }
+
+        // 5. Ordenação por menor ou maior preço
+        if (ordem === "asc") {
+            sql += " ORDER BY preco ASC";
+        } else if (ordem === "desc") {
+            sql += " ORDER BY preco DESC";
+        } else {
+            sql += " ORDER BY id DESC"; // Ordenação padrão por ID
+        }
+
+        // 6. Paginação (Fixado em 10 itens por página)
+        const limite = 10;
+        const numPagina = Math.max(1, parseInt(pagina) || 1);
+        const offset = (numPagina - 1) * limite;
+
+        sql += ` LIMIT ${limite} OFFSET${offset}`;
+
+        const [produtos] = await db.pool.query(sql, params);
+
+        res.status(200).json({
+            pagina: numPagina,
+            limite: limite,
+            quantidade: produtos.length,
+            produtos: produtos
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            msg: "Erro ao buscar produtos."
+        });
+    }
+});
+
 // EXECUTA A MIGRATION ANTES DE ABRIR A API
 async function iniciarServidor() {
     try {
