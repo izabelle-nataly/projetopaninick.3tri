@@ -2,6 +2,7 @@ const db = require("./db");
 
 async function criarTabelas() {
     try {
+        // Tabela de clientes
         await db.pool.query(`
             CREATE TABLE IF NOT EXISTS cliente (
                 id INT PRIMARY KEY AUTO_INCREMENT,
@@ -10,6 +11,16 @@ async function criarTabelas() {
                 celular CHAR(15) NOT NULL,
                 email VARCHAR(100) NOT NULL UNIQUE,
                 senha VARCHAR(255) NOT NULL
+            )
+        `);
+
+        // Tabela de produtos
+        await db.pool.query(`
+            CREATE TABLE IF NOT EXISTS produto (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                nome VARCHAR(150) NOT NULL,
+                categoria VARCHAR(50) NOT NULL,
+                preco DECIMAL(10,2) NOT NULL
             )
         `);
 
