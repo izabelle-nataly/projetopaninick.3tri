@@ -12,6 +12,8 @@
 
 //Combinar múltiplos filtros: `
 
+//node criarTabela.js
+
 
 
 
