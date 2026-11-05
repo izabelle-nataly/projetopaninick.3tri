@@ -1,72 +1,76 @@
-const API = "http://localhost:3000";
+const API_URL = "http://localhost:3000";
 
-// Mostra uma mensagem na tela
-function mostrarMensagem(texto, tipo) {
-    const elemento = document.getElementById("mensagem");
+// --- CADASTRAR USUÁRIO ---
+const formCadastro = document.getElementById("formCadastro");
+if (formCadastro) {
+    formCadastro.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-    if (!elemento) return;
+        const nome = document.getElementById("nome").value;
+        const email = document.getElementById("email").value;
+        const senha = document.getElementById("senha").value;
 
-    elemento.textContent = texto;
-    elemento.className = "mensagem " + tipo;
-}
+        try {
+            const res = await fetch(`${API_URL}/cadastro`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nome, email, senha })
+            });
 
-// Encerra a sessão
-function logout() {
-    localStorage.removeItem("nome_cliente");
-    localStorage.removeItem("token");
+            const data = await res.json();
 
-    window.location.href = "login.html";
-}
-
-// Carrega os dados do perfil usando o token
-async function carregarPerfil() {
-    const token = localStorage.getItem("token");
-    const nome = localStorage.getItem("nome_cliente");
-
-    if (!token || !nome) {
-        window.location.href = "login.html";
-        return;
-    }
-
-    const area = document.getElementById("perfil-info");
-
-    try {
-        const resposta = await fetch(`${API}/cliente/perfil`, {
-            headers: {
-                Authorization: `Bearer ${token}`
+            if (res.ok) {
+                alert("Cadastro realizado com sucesso! Faça login.");
+                window.location.href = "login.html";
+            } else {
+                alert(data.mensagem || "Erro ao cadastrar.");
             }
-        });
-
-        const dados = await resposta.json();
-
-        if (!resposta.ok) {
-            throw new Error(dados.msg || "Não foi possível carregar o perfil.");
+        } catch (error) {
+            alert("Erro ao conectar com o servidor.");
         }
-
-        area.innerHTML = "";
-
-        const campos = [
-            ["Nome", dados.nome],
-            ["CPF", dados.cpf],
-            ["Celular", dados.celular],
-            ["Email", dados.email]
-        ];
-
-        campos.forEach(([titulo, valor]) => {
-            const paragrafo = document.createElement("p");
-            const rotulo = document.createElement("strong");
-
-            rotulo.textContent = titulo + ": ";
-            paragrafo.appendChild(rotulo);
-            paragrafo.appendChild(document.createTextNode(valor));
-
-            area.appendChild(paragrafo);
-        });
-    } catch (error) {
-        area.textContent = error.message;
-
-        if (error.message.includes("Token")) {
-            logout();
-        }
-    }
+    });
 }
+
+// --- LOGIN DO USUÁRIO ---
+const formLogin = document.getElementById("formLogin");
+if (formLogin) {
+    formLogin.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById("email").value;
+        const senha = document.getElementById("senha").value;
+
+        try {
+            const res = await fetch(`${API_URL}/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, senha })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                // Salva no LocalStorage
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("nome", data.nome);
+
+                alert(`Bem-vindo(a), ${data.nome}!`);
+                window.location.href = "index.html";
+            } else {
+                alert(data.mensagem || "Erro ao realizar login.");
+            }
+        } catch (error) {
+            alert("Erro ao conectar com o servidor.");
+        }
+    });
+}
+
+// --- VERIFICAR LOGIN NA PÁGINA PRINCIPAL ---
+document.addEventListener("DOMContentLoaded", () => {
+    const usuarioLogadoSpan = document.getElementById("usuarioLogado");
+    const nomeStorage = localStorage.getItem("nome");
+
+    if (usuarioLogadoSpan && nomeStorage) {
+        usuarioLogadoSpan.innerText = `Olá, ${nomeStorage}!`;
+    }
+});
